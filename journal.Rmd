@@ -126,7 +126,7 @@ print(most_innovative_sector)
 
 ```{r p3.3.2}
 USPTO_top_5_tbl = readRDS("DS_101/00_data/07_data_journal/USPTO_top_5_tbl.rds")
-print(most_innovative_sector)
+print(USPTO_top_5_tbl)
 ```
 
 # Challenge 4 -> Data visualisation 

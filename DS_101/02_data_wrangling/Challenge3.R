@@ -1,6 +1,6 @@
 library(vroom)
 library(data.table)
-
+library(tidyverse)
 col_types_patent <- list(
   id = col_character(),
   date = col_date("%Y-%m-%d"),
