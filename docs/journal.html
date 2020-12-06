@@ -11,7 +11,7 @@
 
 <meta name="author" content="Sebastian Salas" />
 
-<meta name="date" content="2020-11-05" />
+<meta name="date" content="2020-12-06" />
 
 <title>Journal (reproducible report)</title>
 
@@ -405,39 +405,434 @@ div.tocify {
 
 <h1 class="title toc-ignore">Journal (reproducible report)</h1>
 <h4 class="author">Sebastian Salas</h4>
-<h4 class="date">2020-11-05</h4>
+<h4 class="date">2020-12-06</h4>
 
 </div>
 
 
-<p><strong>IMPORTANT:</strong> You can delete everything in here and start fresh. You might want to start by not deleting anything above this line until you know what that stuff is doing.</p>
-<p>This is an <code>.Rmd</code> file. It is plain text with special features. Any time you write just like this, it will be compiled to normal text in the website. If you put a # in front of your text, it will create a top level-header.</p>
-<div id="my-first-post" class="section level1">
-<h1><span class="header-section-number">1</span> My first post</h1>
-<p>Last compiled: 2020-11-26</p>
-<p>Notice that whatever you define as a top level header, automatically gets put into the table of contents bar on the left.</p>
-<div id="second-level-header" class="section level2">
-<h2><span class="header-section-number">1.1</span> Second level header</h2>
-<p>You can add more headers by adding more hashtags. These won’t be put into the table of contents</p>
-<div id="third-level-header" class="section level3">
-<h3><span class="header-section-number">1.1.1</span> third level header</h3>
-<p>Here’s an even lower level header</p>
+<p><strong>IMPORTANT:</strong> I couldn’t have the password protection for the journal, hence why is not appearing here. I hope is ok.</p>
+<p>This is the journal for all the challenges done in the lecture of Data Science Basics. Here I will post all the solution for the challengens with some parts of code so is appreciatable what I did. If more information is wanted please look at the challenges files (e.g. challenge1.r, challenge2.r …) to see the complete code. For most of these solutions I already saved the wrangled tibbles in a rds file so There is not need to have all the code here.</p>
+<div id="challenge-1---intro-to-tidyversse" class="section level1">
+<h1><span class="header-section-number">1</span> Challenge 1 -&gt; intro to Tidyversse</h1>
+<p>Last compiled: 2020-12-06</p>
+<div id="sales-by-location" class="section level2">
+<h2><span class="header-section-number">1.1</span> Sales by location</h2>
+<p>Analyze the sales by location (state) with a bar plot:</p>
+<pre class="r"><code>salesByState&lt;- readRDS(&quot;./DS_101/00_data/01_bike_sales/02_wrangled_data/salesByState.rds&quot;)
+salesByState %&gt;%
+  ggplot(aes(x = state, y = total_sales)) +
+  geom_col(fill = &quot;#2DC6D6&quot;) + 
+  geom_label(aes(label = sales_text)) + 
+  scale_y_continuous(labels = scales::dollar_format(big.mark = &quot;.&quot;, 
+                                                    decimal.mark = &quot;,&quot;, 
+                                                    prefix = &quot;&quot;, 
+                                                    suffix = &quot; €&quot;)) +
+  labs(
+    title    = &quot;Revenue by State&quot;,
+    subtitle = &quot;Upward Trend&quot;,
+    x = &quot;State&quot;, 
+    y = &quot;Revenue&quot;
+  ) + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))</code></pre>
+<p><img src="journal_files/figure-html/plot1.1-1.png" width="960" /></p>
+</div>
+<div id="sales-by-location-and-year" class="section level2">
+<h2><span class="header-section-number">1.2</span> Sales by location and year</h2>
+<p>Analyze the sales by location and year:</p>
+<pre class="r"><code>salesByStateAndYear&lt;- readRDS(&quot;./DS_101/00_data/01_bike_sales/02_wrangled_data/salesByStateAndYear.rds&quot;)
+salesByStateAndYear %&gt;%
+  
+  # Set up x, y, fill
+  ggplot(aes(x = year, y = total_sales, fill = state)) +
+  
+  # Geometries
+  geom_col() + # Run up to here to get a stacked bar plot
+  
+  # Facet
+  facet_wrap(~ state) +
+  
+  # Formatting
+  scale_y_continuous(labels = scales::dollar_format(big.mark = &quot;.&quot;, 
+                                                    decimal.mark = &quot;,&quot;, 
+                                                    prefix = &quot;&quot;, 
+                                                    suffix = &quot; €&quot;)) +
+  labs(
+    title = &quot;Revenue by year and State&quot;,
+    fill = &quot;State&quot; # Changes the legend name
+  )</code></pre>
+<p><img src="journal_files/figure-html/plot1.2-1.png" width="672" /></p>
 </div>
 </div>
+<div id="challenge-2---web-scrapping-and-api-calling" class="section level1">
+<h1><span class="header-section-number">2</span> Challenge 2 -&gt; Web Scrapping and API calling</h1>
+<p>Last compiled: 2020-12-06</p>
+<div id="api." class="section level2">
+<h2><span class="header-section-number">2.1</span> API.</h2>
+<p>Get some data via an API. The selected API was random cats facts :v. (<a href="https://cat-fact.herokuapp.com/" class="uri">https://cat-fact.herokuapp.com/</a>)</p>
+<pre class="r"><code>cat_facts = readRDS(&quot;DS_101/00_data/07_data_journal/catFacts.rds&quot;)
+print(cat_facts)</code></pre>
+<pre><code>## # A tibble: 10 x 11
+##    used  source type  deleted `_id` updatedAt createdAt user  text  `__v`
+##    &lt;lgl&gt; &lt;chr&gt;  &lt;chr&gt; &lt;lgl&gt;   &lt;chr&gt; &lt;chr&gt;     &lt;chr&gt;     &lt;chr&gt; &lt;chr&gt; &lt;int&gt;
+##  1 FALSE user   cat   FALSE   5c69~ 2020-08-~ 2019-02-~ 5a9a~ &quot;Abr~     0
+##  2 FALSE user   cat   FALSE   59b1~ 2020-08-~ 2018-04-~ 5a9a~ &quot;The~     0
+##  3 FALSE user   cat   FALSE   5b1b~ 2020-08-~ 2018-06-~ 5a9a~ &quot;Dom~     0
+##  4 FALSE user   cat   FALSE   5b1b~ 2020-08-~ 2018-06-~ 5a9a~ &quot;In ~     0
+##  5 FALSE api    cat   FALSE   591f~ 2020-08-~ 2018-08-~ 5a9a~ &quot;Cat~     0
+##  6 FALSE user   cat   FALSE   58e0~ 2020-08-~ 2018-01-~ 58e0~ &quot;Ori~     0
+##  7 FALSE api    cat   FALSE   591f~ 2020-08-~ 2018-01-~ 5a9a~ &quot;Cat~     0
+##  8 FALSE user   cat   FALSE   5fc7~ 2020-12-~ 2020-12-~ 5fc7~ &quot;Cat~     0
+##  9 FALSE user   cat   FALSE   5f86~ 2020-10-~ 2020-10-~ 5f86~ &quot;The~     0
+## 10 FALSE user   cat   FALSE   5a45~ 2020-08-~ 2018-01-~ 5a9a~ &quot;A c~     0
+## # ... with 2 more variables: status$verified &lt;lgl&gt;, $sentCount &lt;int&gt;</code></pre>
 </div>
-<div id="my-second-post-note-the-order" class="section level1">
-<h1><span class="header-section-number">2</span> My second post (note the order)</h1>
-<p>Last compiled: 2020-11-26</p>
-<p>I’m writing this tutorial going from the top down. And, this is how it will be printed. So, notice the second post is second in the list. If you want your most recent post to be at the top, then make a new post starting at the top. If you want the oldest first, do, then keep adding to the bottom</p>
+<div id="web-scrapping" class="section level2">
+<h2><span class="header-section-number">2.2</span> Web scrapping</h2>
+<p>Scrape one of the competitor websites of canyon (<a href="https://www.radon-bikes.de" class="uri">https://www.radon-bikes.de</a>) and create a small database:</p>
+<pre class="r"><code>data_bikes_tbl = readRDS(&quot;DS_101/00_data/07_data_journal/data_bikes_tbl.rds&quot;)
+print(data_bikes_tbl)</code></pre>
+<pre><code>## # A tibble: 115 x 5
+##    position model        category       price url                               
+##       &lt;int&gt; &lt;chr&gt;        &lt;chr&gt;          &lt;chr&gt; &lt;glue&gt;                            
+##  1        1 JEALOUS8.0   mountainbike_~ 2599~ https://www.radon-bikes.de/en/mou~
+##  2        2 JEALOUS9.0   mountainbike_~ 2999~ https://www.radon-bikes.de/en/mou~
+##  3        3 JEALOUS10.0  mountainbike_~ 3999~ https://www.radon-bikes.de/en/mou~
+##  4        4 JEALOUS10.0~ mountainbike_~ 5299~ https://www.radon-bikes.de/en/mou~
+##  5        5 JEALOUS10.0  mountainbike_~ 3699~ https://www.radon-bikes.de/en/mou~
+##  6        6 JEALOUS10.0~ mountainbike_~ 3799€ https://www.radon-bikes.de/en/mou~
+##  7        7 NEWJEALOUSS~ mountainbike_~ 999 € https://www.radon-bikes.de/en/mou~
+##  8        8 JEALOUSAL8.0 mountainbike_~ 999 € https://www.radon-bikes.de/en/mou~
+##  9        9 JEALOUSAL8.~ mountainbike_~ 1299~ https://www.radon-bikes.de/en/mou~
+## 10       10 JEALOUSAL9.0 mountainbike_~ 1499~ https://www.radon-bikes.de/en/mou~
+## # ... with 105 more rows</code></pre>
 </div>
-<div id="adding-r-stuff" class="section level1">
-<h1><span class="header-section-number">3</span> Adding R stuff</h1>
-<p>So far this is just a blog where you can write in plain text and serve your writing to a webpage. One of the main purposes of this lab journal is to record your progress learning R. The reason I am asking you to use this process is because you can both make a website, and a lab journal, and learn R all in R-studio. This makes everything really convenient and in the same place.</p>
-<p>So, let’s say you are learning how to make a histogram in R. For example, maybe you want to sample 100 numbers from a normal distribution with mean = 0, and standard deviation = 1, and then you want to plot a histogram. You can do this right here by using an r code block, like this:</p>
-<pre class="r"><code>samples &lt;- rnorm(100, mean=0, sd=1)
-hist(samples)</code></pre>
-<p><img src="journal_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
-<p>When you knit this R Markdown document, you will see that the histogram is printed to the page, along with the R code. This document can be set up to hide the R code in the webpage, just delete the comment (hashtag) from the cold folding option in the yaml header up top. For purposes of letting yourself see the code, and me see the code, best to keep it the way that it is. You’ll learn that all of these things and more can be customized in each R code block.</p>
+</div>
+<div id="challenge-3---data-wrangling" class="section level1">
+<h1><span class="header-section-number">3</span> Challenge 3 -&gt; Data Wrangling</h1>
+<p>In this challenge I had some problems processing the patent.tsv, then I decided to use the files that were given by one of the tutors in mattermost. Here are the results. Also the .tsv files didn’t have information about the country then all of these solutions are for companies worldwide. If there was information about countries then, doing something like a filter where country was equal to US will have been enough to limit the search.</p>
+<div id="patent-dominance" class="section level2">
+<h2><span class="header-section-number">3.1</span> Patent Dominance</h2>
+<p>What US company / corporation has the most patents? List the 10 US companies with the most assigned/granted patents.</p>
+<pre class="r"><code>patent_dominance_tbl = readRDS(&quot;DS_101/00_data/07_data_journal/patent_dominance_tbl.rds&quot;)
+print(patent_dominance_tbl)</code></pre>
+<pre><code>## # A tibble: 47,011 x 3
+## # Groups:   assignee_id [47,011]
+##    assignee_id              organization                             num_patents
+##    &lt;chr&gt;                    &lt;chr&gt;                                          &lt;int&gt;
+##  1 org_ONzMjdbZXiKfw4L0cXl6 International Business Machines Corpora~        7547
+##  2 org_pCbqlmAg8wlWzoi18ITD Samsung Electronics Co., Ltd.                   5835
+##  3 org_eAKK85fawH0NS7AdXOig Canon Kabushiki Kaisha                          4099
+##  4 org_g8U335TH48QmGJOIQnNl Sony Corporation                                3326
+##  5 org_LKW5uc4C9BNTBapFdHzJ Microsoft Corporation                           3165
+##  6 org_LRPLF1XVb00MQdPndIbu Google Inc.                                     2668
+##  7 org_EccJQIigrq4WyGinD0b8 Kabushiki Kaisha Toshiba                        2656
+##  8 org_adUSPYdjFbyHvoVakUrc QUALCOMM Incorporated                           2597
+##  9 org_dfvuIWENawcU6lTd1Z3w LG Electronics Inc.                             2459
+## 10 org_h5J6cVWyUahTuvNuksTb Panasonic Corporation                           2218
+## # ... with 47,001 more rows</code></pre>
+</div>
+<div id="recent-patent-acitivity." class="section level2">
+<h2><span class="header-section-number">3.2</span> Recent patent acitivity.</h2>
+<p>What US company had the most patents granted in 2019? List the top 10 companies with the most new granted patents for 2019. As I used a limited set, I selected to use the month of July instead of year 2019</p>
+<pre class="r"><code>patent_dominance_july_tbl = readRDS(&quot;DS_101/00_data/07_data_journal/patent_dominance_july_tbl.rds&quot;)
+print(patent_dominance_july_tbl)</code></pre>
+<pre><code>## # A tibble: 10 x 3
+## # Groups:   assignee_id [10]
+##    assignee_id              organization                             num_patents
+##    &lt;chr&gt;                    &lt;chr&gt;                                          &lt;int&gt;
+##  1 org_ONzMjdbZXiKfw4L0cXl6 International Business Machines Corpora~         772
+##  2 org_pCbqlmAg8wlWzoi18ITD Samsung Electronics Co., Ltd.                    584
+##  3 org_eAKK85fawH0NS7AdXOig Canon Kabushiki Kaisha                           447
+##  4 org_g8U335TH48QmGJOIQnNl Sony Corporation                                 327
+##  5 org_LKW5uc4C9BNTBapFdHzJ Microsoft Corporation                            315
+##  6 org_adUSPYdjFbyHvoVakUrc QUALCOMM Incorporated                            278
+##  7 org_dfvuIWENawcU6lTd1Z3w LG Electronics Inc.                              256
+##  8 org_EccJQIigrq4WyGinD0b8 Kabushiki Kaisha Toshiba                         255
+##  9 org_LRPLF1XVb00MQdPndIbu Google Inc.                                      254
+## 10 org_h5J6cVWyUahTuvNuksTb Panasonic Corporation                            240</code></pre>
+</div>
+<div id="innovation-in-tech" class="section level2">
+<h2><span class="header-section-number">3.3</span> Innovation in Tech</h2>
+<p>What is the most innovative tech sector? For the top 10 companies (worldwide) with the most patents, what are the top 5 USPTO tech main classes?</p>
+<pre class="r"><code>most_innovative_sector = readRDS(&quot;DS_101/00_data/07_data_journal/most_innovative_sector.rds&quot;)
+print(most_innovative_sector)</code></pre>
+<pre><code>## # A tibble: 10 x 2
+##    mainclass_id num_patents
+##    &lt;chr&gt;              &lt;int&gt;
+##  1 257                40526
+##  2 455                29481
+##  3 370                25390
+##  4 438                19804
+##  5 709                18500
+##  6 435                15690
+##  7 514                14147
+##  8 345                13466
+##  9 348                12320
+## 10 375                11348</code></pre>
+<pre class="r"><code>USPTO_top_5_tbl = readRDS(&quot;DS_101/00_data/07_data_journal/USPTO_top_5_tbl.rds&quot;)
+print(most_innovative_sector)</code></pre>
+<pre><code>## # A tibble: 10 x 2
+##    mainclass_id num_patents
+##    &lt;chr&gt;              &lt;int&gt;
+##  1 257                40526
+##  2 455                29481
+##  3 370                25390
+##  4 438                19804
+##  5 709                18500
+##  6 435                15690
+##  7 514                14147
+##  8 345                13466
+##  9 348                12320
+## 10 375                11348</code></pre>
+</div>
+</div>
+<div id="challenge-4---data-visualisation" class="section level1">
+<h1><span class="header-section-number">4</span> Challenge 4 -&gt; Data visualisation</h1>
+<p>So far the most difficult one, as the geom_map() was not talked much on the classbook. Thanks google.</p>
+<div id="map-the-time-course-of-the-cumulative-covid-19-cases" class="section level2">
+<h2><span class="header-section-number">4.1</span> Map the time course of the cumulative Covid-19 cases</h2>
+<pre class="r"><code>filtered_covid_data_tbl = readRDS(&quot;DS_101/00_data/07_data_journal/filtered_covid_data_tbl.rds&quot;)
+
+month_arr &lt;- c(31,60,91,121,152,182,213,244,274,305,335)
+
+filtered_covid_data_tbl %&gt;%
+  ggplot(aes(cum_days, cum_cases, color = Country)) +
+  geom_line( size = 1) +
+  scale_y_continuous(name = &quot;Cumulative Cases&quot; , limits = c(0,15e6), labels = scales::unit_format(scale = 1e-6,
+                                                    preix = &quot;&quot;,
+                                                    suffix = &quot;M&quot;)) +
+  scale_x_continuous(name = &quot;Year 2020&quot;, breaks = month_arr, labels = month.name[1:11]) +
+  theme(
+    axis.text.x = element_text(
+      angle = 45,
+      hjust = 1
+    ),
+    legend.position = &quot;bottom&quot;
+  ) +
+  labs(
+    title = str_glue(&quot;COVID-19 confirmed cases worldwide&quot;)
+  )</code></pre>
+<p><img src="journal_files/figure-html/plot4.1-1.png" width="672" /></p>
+</div>
+<div id="visualize-the-distribution-of-the-mortality-rate" class="section level2">
+<h2><span class="header-section-number">4.2</span> Visualize the distribution of the mortality rate</h2>
+<pre class="r"><code>mortality_rate_tbl = readRDS(&quot;DS_101/00_data/07_data_journal/mortality_rate_tbl.rds&quot;)
+
+world &lt;- map_data(&quot;world&quot;)
+
+plot_data &lt;- world %&gt;%
+  left_join(mortality_rate_tbl)
+
+ggplot(plot_data, aes(map_id = region, fill = mort_rate))+
+  geom_map(map = plot_data,  color = &quot;#AAAAAA&quot;)+
+  expand_limits(x = c(180,-180), y = c(85,-85)) +
+  scale_fill_continuous(name = &quot;Mortality Rate&quot;, 
+                        low = &quot;#DD0000&quot;, 
+                        high = &quot;#440000&quot;,
+                        na.value = &quot;grey&quot;,
+                        limits = c(0,0.0015),
+                        breaks = c(0,0.0003,0.0006,0.0009,0.0012,0.0015),
+                        labels = scales::percent
+                        ) +
+  theme(
+    axis.title = element_blank() ,
+    axis.text = element_blank(),
+    axis.ticks = element_blank()
+  ) +
+  labs(
+    title = str_glue(&quot;Confirmed COVID-19 deaths relative to the size of population&quot;)
+  )</code></pre>
+<p><img src="journal_files/figure-html/plot4.2-1.png" width="672" /></p>
+</div>
+</div>
+<div id="some-code-parts-so-you-see-what-i-worked" class="section level1">
+<h1><span class="header-section-number">5</span> Some code parts so you see what I worked</h1>
+<div id="challenge-1" class="section level2">
+<h2><span class="header-section-number">5.1</span> Challenge 1</h2>
+<pre class="r"><code>#Data wrangling for salesByState
+salesByState &lt;- bike_orderlines_wrangled_tbl %&gt;% 
+  select(&quot;location&quot;,&quot;total_price&quot;) %&gt;%
+  separate(col = &quot;location&quot;, into = c(&quot;city&quot;,&quot;state&quot;),sep = &quot;, &quot;) %&gt;%
+  group_by(state) %&gt;%
+  summarize(&quot;total_sales&quot; = sum(total_price)) %&gt;%
+  mutate(sales_text = scales::dollar(total_sales, big.mark = &quot;.&quot;, 
+                                     decimal.mark = &quot;,&quot;, 
+                                     prefix = &quot;&quot;, 
+                                     suffix = &quot; €&quot;))
+
+#Data Wrangling for salesByStateAndYear
+salesByStateAndYear &lt;- bike_orderlines_wrangled_tbl %&gt;% 
+  select(&quot;order_date&quot;,&quot;location&quot;,&quot;total_price&quot;) %&gt;%
+  separate(col = &quot;location&quot;, into = c(&quot;city&quot;,&quot;state&quot;),sep = &quot;, &quot;) %&gt;%
+  mutate(&quot;year&quot; = year(order_date)) %&gt;%
+  group_by(state,year) %&gt;%
+  summarize(&quot;total_sales&quot; = sum(total_price)) %&gt;%
+  mutate(sales_text = scales::dollar(total_sales, big.mark = &quot;.&quot;, 
+                                     decimal.mark = &quot;,&quot;, 
+                                     prefix = &quot;&quot;, 
+                                     suffix = &quot; €&quot;))</code></pre>
+</div>
+<div id="challenge-2" class="section level2">
+<h2><span class="header-section-number">5.2</span> Challenge 2</h2>
+<pre class="r"><code>## API REQUEST ---- CAT FACTS API
+
+resp &lt;- GET(&quot;https://cat-fact.herokuapp.com/facts/random?animal_type=cat&amp;amount=10&quot;)
+
+resp &lt;- resp$content %&gt;%
+  rawToChar() %&gt;%
+  fromJSON() %&gt;%
+  as_tibble()
+
+## WEB SRAPPING ---- RADON-BIKES 
+
+url &lt;- &quot;https://www.radon-bikes.de/en/&quot;
+
+html &lt;- url %&gt;% read_html()
+
+
+#Category links
+bikes_category_links &lt;- html %&gt;%
+  html_nodes(css = &quot;.megamenu__item&gt;a&quot;) %&gt;%
+  html_attr(&#39;href&#39;) %&gt;%
+  discard(.p = ~stringr::str_detect(.x,&quot;wear&quot;)) %&gt;%
+  enframe(name = &quot;position&quot;, value = &quot;subdirectory&quot;) %&gt;%
+  mutate(url = glue(&quot;https://www.radon-bikes.de{subdirectory}bikegrid/&quot;)) %&gt;%
+  select(-subdirectory)
+
+#Get info bikes function
+get_bike_info &lt;- function (url) {
+  
+  html &lt;- url %&gt;% read_html()
+  #get base nodes
+  base_nodes &lt;- html %&gt;%
+    html_nodes(css = &quot;.m-bikegrid__item&gt;div&gt;a&quot;)
+  
+  #get more info links
+  more_info_links &lt;- base_nodes %&gt;%
+    html_attr(&#39;href&#39;) %&gt;%
+    enframe(name = &quot;position&quot;, value = &quot;subdirectory&quot;) %&gt;%
+    mutate(url = glue(&quot;https://www.radon-bikes.de{subdirectory}&quot;)) %&gt;%
+    select(-subdirectory)
+  
+  #get bike model name
+  bike_model &lt;- base_nodes %&gt;%
+    html_nodes(css = &quot;div&gt;.a-heading&quot;) %&gt;%
+    html_text() %&gt;%
+    stringr::str_extract(&quot;(?&lt;=\\n ).*(?=\\n)&quot;) %&gt;%
+    enframe(name = &quot;position&quot;, value = &quot;subdirectory&quot;) %&gt;%
+    rename(model = subdirectory)
+  
+  bike_model$model &lt;- gsub(&quot; &quot;, &quot;&quot;, bike_model$model, fixed = TRUE)
+  
+  #get bike price
+  bike_price &lt;- base_nodes %&gt;%
+    html_nodes(css = &quot;div&gt;.currency_eur&gt;.m-bikegrid__price--active&quot;) %&gt;%
+    html_text() %&gt;%
+    enframe(name = &quot;position&quot;, value = &quot;subdirectory&quot;) %&gt;%
+    rename(price = subdirectory)
+  
+  bikes_category_tbl &lt;- bike_model %&gt;%
+    mutate(category = url %&gt;% stringr::str_extract(&quot;(?&lt;=en/).*(?=/bikegrid/)&quot;) %&gt;% str_replace_all(&quot;/&quot;,&quot;_&quot;)) %&gt;%
+    left_join(bike_price) %&gt;%
+    left_join(more_info_links)
+  
+} 
+
+url_vector &lt;- bikes_category_links %&gt;%
+  pull(url)
+
+data_bikes_tbl &lt;- url_vector %&gt;%
+  map(get_bike_info) %&gt;%
+  bind_rows()</code></pre>
+</div>
+<div id="challenge-3" class="section level2">
+<h2><span class="header-section-number">5.3</span> Challenge 3</h2>
+<pre class="r"><code>#1.Patent Dominance
+
+patent_dominance_tbl &lt;- assignee_tbl %&gt;%
+  rename(assignee_id = id) %&gt;%
+  left_join(patent_assignee_tbl) %&gt;%
+  group_by(assignee_id,organization) %&gt;%
+  summarise(&quot;num_patents&quot; = n()) %&gt;%
+  arrange(desc(num_patents))
+
+#2.Recent patent acitivity
+
+patent_dominance_july_tbl &lt;- assignee_tbl %&gt;%
+  rename(assignee_id = id) %&gt;%
+  left_join(patent_assignee_tbl) %&gt;%
+  rename(id = patent_id) %&gt;%
+  left_join(patent_tbl) %&gt;%
+  separate(col = date, into = c(&quot;year&quot;,&quot;month&quot;,&quot;day&quot;),sep = &quot;-&quot;) %&gt;%
+  mutate(
+    year  = as.numeric(year),
+    month = as.numeric(month),
+    day   = as.numeric(day)
+  ) %&gt;%
+  select(-year,-day,-id,-num_claims) %&gt;%
+  filter(month == 07) %&gt;%
+  group_by(assignee_id,organization) %&gt;%
+  summarise(&quot;num_patents&quot; = n()) %&gt;%
+  arrange(desc(num_patents))%&gt;%
+  head(10)
+
+##3.1 most innovative tech sector (mainclass with more patents)
+most_innovative_sector &lt;- uspc_tbl %&gt;%
+  group_by(mainclass_id) %&gt;%
+  summarise(&quot;num_patents&quot; = n()) %&gt;%
+  arrange(desc(num_patents))%&gt;%
+  head(10)
+
+##3.2 top 5 USPTO tech main classes from 10 top companies worldwide
+
+patent_dominance_10_tbl &lt;- assignee_tbl %&gt;%
+  rename(assignee_id = id) %&gt;%
+  left_join(patent_assignee_tbl) %&gt;%
+  group_by(assignee_id,organization) %&gt;%
+  summarise(&quot;num_patents&quot; = n()) %&gt;%
+  arrange(desc(num_patents)) %&gt;%
+  head(10)
+
+assignee_id_10 &lt;- patent_dominance_10_tbl$assignee_id
+
+USPTO_top_5_tbl &lt;- assignee_tbl %&gt;%
+  rename(assignee_id = id) %&gt;%
+  left_join(patent_assignee_tbl) %&gt;%
+  left_join(uspc_tbl) %&gt;%
+  filter(assignee_id %in% assignee_id_10) %&gt;%
+  filter(!is.na(mainclass_id)) %&gt;%
+  group_by(mainclass_id) %&gt;%
+  summarise(&quot;num_patents&quot; = n()) %&gt;%
+  arrange(desc(num_patents)) %&gt;%
+  head(5)</code></pre>
+</div>
+<div id="challenge-4" class="section level2">
+<h2><span class="header-section-number">5.4</span> Challenge 4</h2>
+<pre class="r"><code>#PART 1
+covid_data_tbl &lt;- covid_data_tbl %&gt;%
+  rename(Country = countriesAndTerritories, Continent = continentExp)
+
+filtered_covid_data_tbl &lt;- covid_data_tbl %&gt;%
+  filter(Country %in% c(&quot;Germany&quot;,&quot;United_Kingdom&quot;,&quot;France&quot;,&quot;Spain&quot;,&quot;United_States_of_America&quot;)) %&gt;%
+  arrange(month) %&gt;%
+  arrange(Country) %&gt;%
+  select(Country,month,cases) %&gt;%
+  group_by(Country) %&gt;%
+  mutate(cum_cases = cumsum(cases)) %&gt;%
+  mutate(month_name = month.name[month]) %&gt;%
+  mutate(cum_days = 1:n())
+
+
+# PART 2
+
+mortality_rate_tbl &lt;- covid_data_tbl %&gt;%
+  select(Country,cases,deaths,geoId,countryterritoryCode,popData2019,Continent) %&gt;%
+  group_by(Country,geoId,countryterritoryCode,popData2019,Continent) %&gt;%
+  summarise(&quot;total_deaths&quot; = sum(deaths)) %&gt;%
+  mutate(mort_rate = total_deaths/popData2019) %&gt;%
+  mutate(mort_rate_percentage = scales::percent(mort_rate, accuracy = 1e-3)) %&gt;%
+  rename(region = Country)</code></pre>
+</div>
 </div>
 
 
